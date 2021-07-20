@@ -287,6 +287,8 @@ Resources:
       SecurityGroups:
         - !Ref WorkerNodesSecurityGroup
       UserData:
+        # see https://github.com/awslabs/amazon-eks-ami/blob/master/amazon-eks-nodegroup.yaml#L657
+        # TODO: I think we can delete the cfn-signal line
         Fn::Base64: !Sub |
             #!/bin/bash
             set -o xtrace
