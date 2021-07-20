@@ -29,13 +29,17 @@ Mappings:
   # https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
   EksAmiIds:
     us-east-1:
-      Standard: ami-0a0b913ef3249b655
-    us-east-2:
-      Standard: ami-0958a76db2d150238
+      Standard: ami-010975c09d109c61f
     us-west-2:
-      Standard: ami-0f54a2f7d2e9c88b3
+      Standard: ami-0245f46bc95672dbb
     eu-west-1:
-      Standard: ami-00c3b2d35bddd4f5c
+      Standard: ami-019fc782a64947dea
+    ap-northeast-1:
+      Standard: ami-0e364ee844856424a
+    ap-northeast-2:
+      Standard: ami-0aa7c9b2a73670112
+    ap-northeast-3:
+      Standard: ami-0496c4a8f594c9fa2
 
 Resources:
 
@@ -128,7 +132,7 @@ Resources:
     Type: AWS::EKS::Cluster
     Properties:
       Name: !Ref AWS::StackName
-      Version: "1.10"
+      Version: "1.21"
       RoleArn: !GetAtt ControlPlaneRole.Arn
       ResourcesVpcConfig:
         SecurityGroupIds:
@@ -149,6 +153,7 @@ Resources:
                 - eks.amazonaws.com
             Action: sts:AssumeRole
       ManagedPolicyArns: 
+        # TODO: inspect these policies
         - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
         - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
 
