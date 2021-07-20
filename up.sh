@@ -11,7 +11,7 @@ function print_help {
   echo "--stack-name  cloudformation stack name"
   echo "--worker-nodes-instance-type  aws instancy type of the worker nodes"
   echo "--key-pair-name name of the private key pair on your aws account"
-  # echo "--update-kubectl-context updates context for installed kubectl"
+  echo "--update-kubectl-context updates context for installed kubectl"
 }
 
 # EDIT THIS:
@@ -20,6 +20,7 @@ NUM_WORKER_NODES=3
 WORKER_NODES_INSTANCE_TYPE=t2.micro
 STACK_NAME=test-cluster
 KEY_PAIR_NAME=
+UPDATE_CONTEXT=
 #------------------------------------------------------------------------------#
 
 while [[ $# -gt 0 ]]; do
@@ -49,16 +50,22 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        # --update-kubectl-context)
-        #     UPDATE_CONTEXT=true
-        #     shift
-        #     ;;
+        --update-kubectl-context)
+            UPDATE_CONTEXT=true
+            shift
+            ;;
         *)    # unknown option
             echo "Unknown option: $1"
             exit 1
             ;;
     esac
 done
+
+# mandate the use of a key pair
+if [[ ! $KEY_PAIR_NAME ]]; then
+  echo "Please specify a key pair to use"
+  exit 1
+fi
 
 # Output colours
 COL='\033[1;34m'
@@ -77,8 +84,11 @@ aws cloudformation deploy \
 
 # by default, the resulting configuration file is created
 # at the default kubeconfig path (.kube/config) in your home directory
-echo -e "\n$COL> Updating kubeconfig file...$NOC"
-aws eks update-kubeconfig "$@" --name "$STACK_NAME" 
+if [[ $UPDATE_CONTEXT ]]; # if $UPDATE_CONTEXT is not empty
+then
+  echo -e "\n$COL> Updating kubeconfig file...$NOC"
+  aws eks update-kubeconfig "$@" --name "$STACK_NAME" 
+fi
 
 echo -e "\n$COL> Configuring worker nodes (to join the cluster)...$NOC"
 # Get worker nodes role ARN from CloudFormation stack output
